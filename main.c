@@ -41,7 +41,25 @@ void grammar_init(Grammar *g){
     g->start_symbol=-1;
 }
 
+
+int find_symbol(Grammar *g,const char *name){
+    int name_len=strlen(name);
+    for(int i=0;i<g->symbol_count;i++){
+        if (strncmp(g->symbols[i].name,name,name_len-1)==0){
+            return g->symbols[i].id;
+        }
+    }
+
+    return -1;
+}
+
 int add_symbol(Grammar *g,const char *name,Symbolkind kind){
+    int existing_id=find_symbol(g,name);
+
+    if (existing_id!=-1){
+        return existing_id;
+    }
+    
     if (g->symbol_count>=MAX_SYMBOLS){
         fprintf(stderr,"Error: too many symbols\n");
         exit(1);
@@ -145,6 +163,7 @@ int main(void){
     grammar_init(&g);
 
     int expr=add_symbol(&g,"expr",SYM_NONTERMINAL);
+    int expr2=add_symbol(&g,"expr",SYM_NONTERMINAL);
     int term=add_symbol(&g,"term",SYM_NONTERMINAL);
     int factor=add_symbol(&g,"factor",SYM_NONTERMINAL);
 
