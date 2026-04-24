@@ -9,6 +9,9 @@ void grammar_init(Grammar *g){
     g->symbol_count=0;
     g->rule_count=0;
     g->start_symbol=-1;
+
+    g->augmented_start_symbol=-1;
+    g->augmented_rule=-1;
 }
 
 
@@ -51,7 +54,7 @@ int add_symbol(Grammar *g,const char *name,Symbolkind kind){
     return id;
 }
 
-void add_rule(Grammar *g,int lhs,int rhs[],int rhs_len){
+int add_rule(Grammar *g,int lhs,int rhs[],int rhs_len){
     if (g->rule_count>=MAX_RULES){
         fprintf(stderr,"Error: too many rules\n");
         exit(1);
@@ -74,6 +77,43 @@ void add_rule(Grammar *g,int lhs,int rhs[],int rhs_len){
 
     g->rule_count++;
     
+    return id;
+}
+
+void augment_grammar(Grammar *g){
+    if (g->start_symbol==-1){
+        fprintf(stderr,"Error: start symbol is not set\n");
+        exit(1);
+    }
+
+    if (g->augmented_rule!=-1){
+        return;
+    }
+
+    if (g->rule_count >=MAX_RULES){
+        fprintf(stderr, "Error: too many rules for augmented grammar\n");
+        exit(1);
+    }
+
+    int accept=add_symbol(g,"$accept",SYM_NONTERMINAL);
+
+    //make origin rules move back one position
+    for(int i=g->rule_count;i>0;i--){
+        g->rules[i]=g->rules[i-1];
+        g->rules[i].id=i;
+    }
+
+    //Add rule 0: $accept -> start_symbol
+
+    g->rules[0].id=0;
+    g->rules[0].lhs=accept;
+    g->rules[0].rhs[0]=g->start_symbol;
+    g->rules[0].rhs_len=1;
+
+    g->rule_count++;
+
+    g->augmented_start_symbol=accept;
+    g->augmented_rule=0;
 }
 
 const char *symbol_kind_name(Symbolkind kind){
@@ -125,6 +165,14 @@ void print_grammar(Grammar *g){
         printf("Start symbol: %s\n\n",g->symbols[g->start_symbol].name);
     }else {
         printf("Start symbol: <not set>\n\n");
+    }
+
+    if (g->augmented_start_symbol!=-1){
+        printf("Augmented start symbol: %s\n",
+               g->symbols[g->augmented_start_symbol].name);
+        printf("Augmented rule: Rule %d\n", g->augmented_rule);
+    }else {
+        printf("Augmented start symbol: <not set>\n");
     }
 
     print_symbols(g);

@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "grammar.h"
 
 int main(void){
@@ -39,6 +41,12 @@ int main(void){
 
     (void)EOF_SYM;
 
+    printf("original grammar\n");
+    print_grammar(&g);
+
+    augment_grammar(&g);
+
+    printf("augmented grammar\n");
     print_grammar(&g);
 
 }
