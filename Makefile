@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS= -Wall -Wextra -std=c11 -Iinclude
+CFLAGS= -Wall -Wextra -std=c11 -Iinclude -Isrc
 
 BUILD_DIR=build
 
-GRAMMAR_SRC=src/grammar.c
+GRAMMAR_SRC=src/grammar.c src/lr0.c
 TEST_GRAMMAR_SRC = tests/test_grammar.c
 
 TEST_GRAMMAR_BIN = $(BUILD_DIR)/test_grammar
