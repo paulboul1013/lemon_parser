@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "grammar.h"
+#include "lr0.h"
 
 int main(void){
     Grammar g;
@@ -48,5 +49,13 @@ int main(void){
 
     printf("augmented grammar\n");
     print_grammar(&g);
+
+    Item start_item;
+
+    start_item.rule_id=g.augmented_rule;
+    start_item.dot_pos=0;
+
+    printf("=== start LR(0) item === \n");
+    print_item(&g,start_item);
 
 }
